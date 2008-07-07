@@ -1,5 +1,11 @@
 module JMX
+  # The MBeanServer represents a connection to an MBean server
+  # rather than an actual MBean server.  Depending upon how 
+  # this object is constructed you can either talk to the 
+  # PlatformMBeanServer or any "remote" MBean server.
+  #--
   # Represents both MBeanServer and MBeanServerConnection
+  #++ 
   class MBeanServer
     import javax.management.Attribute
     import javax.management.MBeanServerFactory
@@ -9,6 +15,10 @@ module JMX
     attr_accessor :server
     @@classes = {}
 
+    # when creatinga  new MBeanServer you can optionally specify a location, username, and password
+    # if specify these values (or at least the location) the MBeanServer instance will connect to 
+    # an existing (and remote ) MBean server and register the mbeans there.
+    # otherwise the server will connect to to the local Platform MBean Server.
     def initialize(location=nil, username=nil, password=nil)
       if (location)
         env = username ? 

@@ -135,7 +135,7 @@ module JMX
 
     # Set MBean attribute specified by name to value
     def []=(name, value) 
-      @server.setAttribute @object_name, Attribute.new(name.to_s, value)
+      @server.setAttribute @object_name, javax.management.Attribute.new(name.to_s, value)
     end
 
     def add_notification_listener(filter=nil, handback=nil, &listener)

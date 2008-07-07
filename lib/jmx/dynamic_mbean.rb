@@ -4,7 +4,10 @@ module JMX
   import javax.management.MBeanAttributeInfo
   import javax.management.MBeanInfo
 
+  # Module that is used to bridge java to ruby and ruby to java types.
   module JavaTypeAware
+    # Current list of types we understand  If it's not in this list we are 
+    # assuming that we are going to convert to a java.object
     SIMPLE_TYPES = {
       :int => ['java.lang.Integer', lambda {|param| param.to_i}],
       :list => ['java.util.List', lambda {|param| param.to_a}],
@@ -52,7 +55,6 @@ module JMX
     end
   end    
   
-  
   class Attribute < Struct.new(:name, :type, :description, :is_reader, :is_writer, :is_iser)
     include JavaTypeAware
     
@@ -68,10 +70,26 @@ module JMX
   end
 end
 
-
-=begin rdoc
-  Inherit from this class to create your own ruby based dynamic MBean
-=end
+#  The Ruby-Java JMX utilities work throught the DynamicMBean concept.  Creators of Ruby based MBeans must inherit this
+# class (<tt>RubyDynamicMBean</tt>) in their own bean classes and then register them with a JMX mbean server.  
+#  Here is an example:
+#       class MyMBean < DynamicMBean
+#         rw_attribute :status, :string, "Status information for this process"
+#         
+#         operation "Shutdown this process"
+#         parameter :string, "user_name", "Name of user requesting shutdown"
+#         returns :string
+#         def shutdown(user_name)
+#            "shutdown requests more time"
+#         end
+#       end
+# Once you have defined your bean class you can start declaring attributes and operations.  Attributes come in three flavors: 
+# read, write, and read write.  Simmilar to the <tt>attr*</tt> helpers, there are helpers that are used to create management 
+# attributes. Use +r_attribute+, +w_attribute+, and +rw_attribute+ to declare attributes, and the +operation+, +returns+, and +parameter+
+# helpers to define a management operation.
+# Creating attributes with the *_attribute convention ALSO creates ruby accessors 
+# (it invokes the attr_accessor/attr_reader/attr_writer ruby helpers) to create ruby methods like: user_name= and username.  
+# So in your ruby code you can treat the attributes as "regular" ruby accessors
 class RubyDynamicMBean
   import javax.management.MBeanOperationInfo
   import javax.management.MBeanAttributeInfo
@@ -79,23 +97,28 @@ class RubyDynamicMBean
   
   # TODO: preserve any original method_added?
   # TODO: Error handling here when it all goes wrong?
-  def self.method_added(name)
+  def self.method_added(name) #:nodoc:
     return if Thread.current[:op].nil?
     Thread.current[:op].name = name
     operations << Thread.current[:op].to_jmx
     Thread.current[:op] = nil
   end
 
-  def self.attributes
+  def self.attributes #:nodoc:
     Thread.current[:attrs] ||= []
   end
   
-  def self.operations
+  def self.operations #:nodoc:
     Thread.current[:ops] ||= []
   end
 
-  #methods used to create an attribute.  They are modeled on the attrib_accessor
+  # the <tt>rw_attribute</tt> method is used to declare a JMX read write attribute.
+  # see the +JavaSimpleTypes+ module for more information about acceptable types
+  # usage: 
+  # rw_attribute :attribute_name, :string, "Description displayed in a JMX console"
+  #--methods used to create an attribute.  They are modeled on the attrib_accessor
   # patterns of creating getters and setters in ruby
+  #++
   def self.rw_attribute(name, type, description)
     #QUESTION: Is this here to ensure that our type implements the interface?
     include DynamicMBean
@@ -120,7 +143,10 @@ class RubyDynamicMBean
     end
     
   end
-  # used to create a read only attribute
+  # the <tt>r_attribute</tt> method is used to declare a JMX read only attribute.
+  # see the +JavaSimpleTypes+ module for more information about acceptable types
+  # usage: 
+  #  r_attribute :attribute_name, :string, "Description displayed in a JMX console"
   def self.r_attribute(name, type, description)
     include DynamicMBean        
     attributes << JMX::Attribute.new(name, type, description, true, false).to_jmx
@@ -138,7 +164,10 @@ class RubyDynamicMBean
       attribute = javax.management.Attribute.new(name.to_s, value)
     end
   end
-  # used to create a read only attribute
+  # the <tt>w_attribute</tt> method is used to declare a JMX write only attribute.
+  # see the +JavaSimpleTypes+ module for more information about acceptable types
+  # usage: 
+  #  w_attribute :attribute_name, :string, "Description displayed in a JMX console"
   def self.w_attribute(name, type, description)
     include DynamicMBean        
     attributes << JMX::Attribute.new(name, type, description, false, true).to_jmx
@@ -149,7 +178,14 @@ class RubyDynamicMBean
     end
   end
 
+  # Use the operation method to declare the start of an operation
+  # It takes as an argument the description for the operation
+  #     operation "Used to start the service"
+  #     def start
+  #     end
+  #--
   # Last operation wins if more than one
+  #++
   def self.operation(description)
     include DynamicMBean
 
@@ -157,20 +193,35 @@ class RubyDynamicMBean
     Thread.current[:op] = JMX::Operation.new description
   end
 
+  # Used to declare a parameter (you can declare more than one in succession) that
+  # is associated with the currently declared operation.
+  #     operation "Used to update the name of a service"
+  #     parameter :string, "name", "Set the new name of the service"
+  #     def start
+  #     end
   def self.parameter(type, name=nil, description=nil)
     Thread.current[:op].parameters << JMX::Parameter.new(type, name, description)
   end
 
+  # Used to declare the return type of the operation
+  #     operation "Used to update the name of a service"
+  #     parameter :string, "name", "Set the new name of the service"
+  #     returns :void
+  #     def set_name
+  #     end
   def self.returns(type)
     Thread.current[:op].return_type = type
   end
   
+  # when creating a dynamic MBean we need to provide it with a 
+  # name and a description.
   def initialize(name, description)
     operations = self.class.operations.to_java(MBeanOperationInfo)
     attributes = self.class.attributes.to_java(MBeanAttributeInfo)
     @info = MBeanInfo.new name, description, attributes, nil, operations, nil
   end
 
+  # Retrieve the value of the requested attribute (where attribute is a javax.management.Attribute class)
   def getAttribute(attribute)
     send("jmx_get_"+attribute.downcase)
   end
