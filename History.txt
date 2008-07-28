@@ -1,3 +1,8 @@
 == 0.1
 
 - Initial release
+
+== 0.2
+
+- Ruby-created mbeans can now specify r_attribute, rw_attribute, and w_attributes (by Jay McGaffigan)
+- More rdocs
