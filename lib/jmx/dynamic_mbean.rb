@@ -70,10 +70,10 @@ module JMX
   end
 end
 
-#  The Ruby-Java JMX utilities work throught the DynamicMBean concept.  Creators of Ruby based MBeans must inherit this
+#  The Ruby-Java JMX utilities work throughout the DynamicMBean concept.  Creators of Ruby based MBeans must inherit this
 # class (<tt>RubyDynamicMBean</tt>) in their own bean classes and then register them with a JMX mbean server.  
 #  Here is an example:
-#       class MyMBean < DynamicMBean
+#       class MyMBean < RuybDynamicMBean
 #         rw_attribute :status, :string, "Status information for this process"
 #         
 #         operation "Shutdown this process"
@@ -93,7 +93,13 @@ end
 class RubyDynamicMBean
   import javax.management.MBeanOperationInfo
   import javax.management.MBeanAttributeInfo
+  import javax.management.DynamicMBean
   include JMX::JavaTypeAware
+  
+  #NOTE this will not be needed when JRuby-3164 is fixed.
+  def self.inherited(cls)
+    cls.send(:include, DynamicMBean)
+  end
   
   # TODO: preserve any original method_added?
   # TODO: Error handling here when it all goes wrong?
@@ -120,8 +126,6 @@ class RubyDynamicMBean
   # patterns of creating getters and setters in ruby
   #++
   def self.rw_attribute(name, type, description)
-    #QUESTION: Is this here to ensure that our type implements the interface?
-    include DynamicMBean
     attributes << JMX::Attribute.new(name, type, description, true, true).to_jmx
     attr_accessor name    
     #create a "java" oriented accessor method
@@ -140,15 +144,14 @@ class RubyDynamicMBean
     define_method("jmx_set_#{name.to_s.downcase}") do |value| 
       blck = to_ruby(type)
       eval "@#{name.to_s} = #{blck.call(value)}"
-    end
-    
+    end    
   end
+  
   # the <tt>r_attribute</tt> method is used to declare a JMX read only attribute.
   # see the +JavaSimpleTypes+ module for more information about acceptable types
   # usage: 
   #  r_attribute :attribute_name, :string, "Description displayed in a JMX console"
   def self.r_attribute(name, type, description)
-    include DynamicMBean        
     attributes << JMX::Attribute.new(name, type, description, true, false).to_jmx
     attr_reader name
     #create a "java" oriented accessor method
@@ -164,12 +167,12 @@ class RubyDynamicMBean
       attribute = javax.management.Attribute.new(name.to_s, value)
     end
   end
+  
   # the <tt>w_attribute</tt> method is used to declare a JMX write only attribute.
   # see the +JavaSimpleTypes+ module for more information about acceptable types
   # usage: 
   #  w_attribute :attribute_name, :string, "Description displayed in a JMX console"
   def self.w_attribute(name, type, description)
-    include DynamicMBean        
     attributes << JMX::Attribute.new(name, type, description, false, true).to_jmx
     attr_writer name
     define_method("jmx_set_#{name.to_s.downcase}") do |value|
@@ -187,7 +190,6 @@ class RubyDynamicMBean
   # Last operation wins if more than one
   #++
   def self.operation(description)
-    include DynamicMBean
 
     # Wait to error check until method_added so we can know method name
     Thread.current[:op] = JMX::Operation.new description

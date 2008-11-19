@@ -6,9 +6,9 @@ require 'jmx/server'
 
 import java.util.ArrayList
 import javax.management.Attribute
-import javax.management.DynamicMBean
 import javax.management.MBeanInfo
 import javax.management.ObjectName
+import javax.management.DynamicMBean
 
 class ObjectName
   def [](key)
