@@ -83,17 +83,20 @@ end
 #            "shutdown requests more time"
 #         end
 #       end
-# Once you have defined your bean class you can start declaring attributes and operations.  Attributes come in three flavors: 
-# read, write, and read write.  Simmilar to the <tt>attr*</tt> helpers, there are helpers that are used to create management 
-# attributes. Use +r_attribute+, +w_attribute+, and +rw_attribute+ to declare attributes, and the +operation+, +returns+, and +parameter+
-# helpers to define a management operation.
+# Once you have defined your bean class you can start declaring attributes and operations.  
+# Attributes come in three flavors: read, write, and read write.  Simmilar to the <tt>attr*</tt>
+# helpers, there are helpers that are used to create management attributes. Use +r_attribute+,
+# +w_attribute+, and +rw_attribute+ to declare attributes, and the +operation+, +returns+, 
+# and +parameter+ helpers to define a management operation.
 # Creating attributes with the *_attribute convention ALSO creates ruby accessors 
-# (it invokes the attr_accessor/attr_reader/attr_writer ruby helpers) to create ruby methods like: user_name= and username.  
-# So in your ruby code you can treat the attributes as "regular" ruby accessors
+# (it invokes the attr_accessor/attr_reader/attr_writer ruby helpers) to create ruby methods 
+# like: user_name= and username.  So in your ruby code you can treat the attributes 
+# as "regular" ruby accessors
 class RubyDynamicMBean
   import javax.management.MBeanOperationInfo
   import javax.management.MBeanAttributeInfo
   import javax.management.DynamicMBean
+  import javax.management.MBeanInfo
   include JMX::JavaTypeAware
   
   #NOTE this will not be needed when JRuby-3164 is fixed.
@@ -223,7 +226,8 @@ class RubyDynamicMBean
     @info = MBeanInfo.new name, description, attributes, nil, operations, nil
   end
 
-  # Retrieve the value of the requested attribute (where attribute is a javax.management.Attribute class)
+  # Retrieve the value of the requested attribute (where attribute is a 
+  # javax.management.Attribute class)
   def getAttribute(attribute)
     send("jmx_get_"+attribute.downcase)
   end

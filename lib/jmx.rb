@@ -7,16 +7,18 @@ require 'jmx/server'
 import java.util.ArrayList
 import javax.management.Attribute
 import javax.management.MBeanInfo
-import javax.management.ObjectName
 import javax.management.DynamicMBean
 
-class ObjectName
-  def [](key)
-    get_key_property(key.to_s)
-  end
+module JMX
+  import javax.management.ObjectName
+  class ObjectName
+    def [](key)
+      get_key_property(key.to_s)
+    end
   
-  def info(server)
-    server.getMBeanInfo(self)
+    def info(server)
+      server.getMBeanInfo(self)
+    end
   end
 end
 

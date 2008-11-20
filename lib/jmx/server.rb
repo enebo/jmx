@@ -69,12 +69,16 @@ module JMX
 
       @server.query_names(object_name, query)
     end
+    
+    def unregister_mbean(object_name)
+      name = make_object_name object_name
+      @server.unregisterMBean(name)
+      
+    end
 
     def register_mbean(object, object_name)
       name = make_object_name object_name
-
       @server.registerMBean(object, name)
-
       MBeanProxy.generate(@server, name)
     end
     
