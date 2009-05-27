@@ -1,8 +1,8 @@
 include Java
 
-import java.rmi.registry.LocateRegistry
-import java.rmi.registry.Registry
-import java.rmi.server.UnicastRemoteObject
+java_import java.rmi.registry.LocateRegistry
+java_import java.rmi.registry.Registry
+java_import java.rmi.server.UnicastRemoteObject
 
 class RMIRegistry
   def initialize(port = Registry::REGISTRY_PORT)

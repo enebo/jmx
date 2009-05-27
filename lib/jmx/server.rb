@@ -7,10 +7,10 @@ module JMX
   # Represents both MBeanServer and MBeanServerConnection
   #++ 
   class MBeanServer
-    import javax.management.Attribute
-    import javax.management.MBeanServerFactory
-    import javax.management.remote.JMXConnectorFactory
-    import javax.management.remote.JMXServiceURL
+    java_import javax.management.Attribute
+    java_import javax.management.MBeanServerFactory
+    java_import javax.management.remote.JMXConnectorFactory
+    java_import javax.management.remote.JMXServiceURL
 
     attr_accessor :server
     @@classes = {}
@@ -101,8 +101,8 @@ module JMX
   end
 
   class MBeanServerConnector
-    import javax.management.remote.JMXServiceURL
-    import javax.management.remote.JMXConnectorServerFactory
+    java_import javax.management.remote.JMXServiceURL
+    java_import javax.management.remote.JMXConnectorServerFactory
 
     def initialize(location, server)
       @url = JMXServiceURL.new location

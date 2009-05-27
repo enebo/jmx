@@ -4,13 +4,13 @@ require 'rmi'
 require 'jmx/dynamic_mbean'
 require 'jmx/server'
 
-import java.util.ArrayList
-import javax.management.Attribute
-import javax.management.MBeanInfo
-import javax.management.DynamicMBean
+java_import java.util.ArrayList
+java_import javax.management.Attribute
+java_import javax.management.MBeanInfo
+java_import javax.management.DynamicMBean
 
 module JMX
-  import javax.management.ObjectName
+  java_import javax.management.ObjectName
   class ObjectName
     def [](key)
       get_key_property(key.to_s)
