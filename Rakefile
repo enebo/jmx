@@ -10,10 +10,10 @@ $LOAD_PATH << 'lib'
 require 'jmx/version'
 begin
   require 'hoe'
-  Hoe.new("jmx", JMX::VERSION) do |p|
-    p.rubyforge_name = "jruby-extras"
-    p.url = "http://jruby-extras.rubyforge.org/jmx"
-    p.author = "Thomas Enebo"
+  Hoe.new("jmxjr", JMX::VERSION) do |p|
+    p.rubyforge_name = "kenai"
+    p.url = "http://kenai.com/projects/jmxjr"
+    p.author = "Thomas Enebo & Jay McGaffigan"
     p.email = "enebo@acm.org"
     p.summary = "Package for interacting/creating Java Management Extensions"
     p.changes = p.paragraphs_of('History.txt', 0..1).join("\n\n")
