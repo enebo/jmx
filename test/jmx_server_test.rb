@@ -10,6 +10,8 @@ require 'rmi'
 require 'jmx'
 
 class MyDynamicMBean < RubyDynamicMBean
+  rw_attribute :name, :string, "My sample attribute"
+
   operation "Doubles a value"
   parameter :int, "a", "Value to double"
   returns :int
@@ -67,7 +69,12 @@ class JMXServerTest < Test::Unit::TestCase
     assert_raise(TypeError) { puts bean.double("HEH") }
     assert_equal("hehheh", bean.string_double("heh"))
     assert_equal("123", bean.concat([1,2,3]))
+
+    assert_nil(bean.name)
+    bean.name = "Name"
+    assert_equal("Name", bean.name)
   end
+
   def test_ruby_mbean_twice
     dyna = MyDynamicMBean.new("domain.MySuperBean", "Heh")
     domain = @server.default_domain

@@ -130,9 +130,12 @@ module JMX
       @operations ||= @info.operations.inject([]) { |s,op| s << op.name }
     end
 
-    # Get MBean attribute specified by name
+    # Get MBean attribute specified by name.  If it is just a plain attribute then
+    # unwrap the attribute and just return the value.
     def [](name)
-      @server.getAttribute @object_name, name.to_s
+      attribute = @server.getAttribute(@object_name, name.to_s)
+      return attribute.value if attribute.kind_of? javax.management.Attribute
+      attribute
     end
 
     # Set MBean attribute specified by name to value
