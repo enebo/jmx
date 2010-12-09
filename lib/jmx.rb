@@ -190,7 +190,7 @@ module JMX
         jtypes << type
         required_type = JavaClass.for_name(type)
         
-        java_arg = param.to_java(type)
+        java_arg = param.to_java(:object)
 
         if (param.kind_of? Array)
           java_arg = param.inject(ArrayList.new) {|l, element| l << element }
