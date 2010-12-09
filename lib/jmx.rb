@@ -172,8 +172,8 @@ module JMX
     def define_operations
       @info.operations.each do |op| 
         self.class.__send__(:define_method, op.name) do |*args|
-          jargs = java_args(op.signature, args)
-          @server.invoke @object_name, op.name, jargs, java_types(jargs)
+          jargs, jtypes = java_args(op.signature, args)
+          @server.invoke @object_name, op.name, jargs, jtypes
         end
       end
     end
@@ -183,29 +183,33 @@ module JMX
     def java_args(signature, params)
       return nil if params.nil?
 
-      i = 0
-      params.map do |param|
-        required_type = JavaClass.for_name(signature[i].get_type)
-        java_arg = Java.ruby_to_java(param)
+      jtypes = []
+      jargs = []
+      params.each_with_index do |param, i|
+        type = signature[i].get_type
+        jtypes << type
+        required_type = JavaClass.for_name(type)
+        
+        java_arg = param.to_java(type)
 
         if (param.kind_of? Array)
           java_arg = param.inject(ArrayList.new) {|l, element| l << element }
         end
+        
+        jargs << java_arg
 
         arg_type = java_arg.java_class
         
         raise TypeError.new("parameter #{signature[i].name} expected to be #{required_type}, but was #{arg_type}") if !required_type.assignable_from? arg_type
-        i = i + 1
-        
-        java_arg
-      end.to_java(:object)
+      end
+      [jargs.to_java, jtypes.to_java(:string)]
     end
 
     # Convert a collection of java objects to their Java class name equivalents
     def java_types(params)
       return nil if params.nil?
 
-      params.map {|e| params.java_class.name }.to_java(:string)
+      params.map {|e| e.class.java_class.name }.to_java(:string)
     end
 
     def underscore(string)
