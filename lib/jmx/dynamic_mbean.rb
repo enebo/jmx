@@ -109,18 +109,18 @@ class RubyDynamicMBean
   # TODO: preserve any original method_added?
   # TODO: Error handling here when it all goes wrong?
   def self.method_added(name) #:nodoc:
-    return if Thread.current[:op].nil?
-    Thread.current[:op].name = name
-    operations << Thread.current[:op].to_jmx
-    Thread.current[:op] = nil
+    return if local_hash[:op].nil?
+    local_hash[:op].name = name
+    operations << local_hash[:op].to_jmx
+    local_hash[:op] = nil
   end
 
   def self.attributes #:nodoc:
-    Thread.current[:attrs] ||= []
+    local_hash[:attrs] ||= []
   end
   
   def self.operations #:nodoc:
-    Thread.current[:ops] ||= []
+    local_hash[:ops] ||= []
   end
 
   def self.define_getter(name, type)
@@ -182,7 +182,7 @@ class RubyDynamicMBean
   #++
   def self.operation(description)
     # Wait to error check until method_added so we can know method name
-    Thread.current[:op] = JMX::Operation.new description
+    local_hash[:op] = JMX::Operation.new description
   end
 
   # Used to declare a parameter (you can declare more than one in succession) that
@@ -192,7 +192,7 @@ class RubyDynamicMBean
   #     def start
   #     end
   def self.parameter(type, name=nil, description=nil)
-    Thread.current[:op].parameters << JMX::Parameter.new(type, name, description)
+    local_hash[:op].parameters << JMX::Parameter.new(type, name, description)
   end
 
   # Used to declare the return type of the operation
@@ -202,9 +202,14 @@ class RubyDynamicMBean
   #     def set_name
   #     end
   def self.returns(type)
-    Thread.current[:op].return_type = type
+    local_hash[:op].return_type = type
   end
   
+  # Thread local storage for the derived bean
+  def self.local_hash
+    Thread.current[self.name] ||= {}
+  end
+
   # when creating a dynamic MBean we need to provide it with a name and a description.
   def initialize(name, description)
     operations = self.class.operations.to_java MBeanOperationInfo
