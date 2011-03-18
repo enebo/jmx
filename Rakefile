@@ -12,9 +12,9 @@ begin
   require 'hoe'
   Hoe.new("jmxjr", JMX::VERSION) do |p|
     p.rubyforge_name = "kenai"
-    p.url = "http://kenai.com/projects/jmxjr"
+    p.url = "http://github.com/enebo/jmxjr"
     p.author = "Thomas Enebo & Jay McGaffigan"
-    p.email = "enebo@acm.org"
+    p.email = "tom.enebo@gmail.com"
     p.summary = "Package for interacting/creating Java Management Extensions"
     p.changes = p.paragraphs_of('History.txt', 0..1).join("\n\n")
     p.description = "Install this gem and require 'jmx' to load the library."
