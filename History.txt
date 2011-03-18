@@ -6,3 +6,8 @@
 
 - Ruby-created mbeans can now specify r_attribute, rw_attribute, and w_attributes (by Jay McGaffigan)
 - More rdocs
+
+== 0.5
+
+- Use 'java_import' instead of 'import' to play nice with Rake
+- Use hash of hash in Thread.current so multiple beans don't add each others crud (by bpardee)

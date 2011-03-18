@@ -11,6 +11,4 @@ lib/jmx/version.rb
 samples/memory.rb
 test/jmx_attribute_test.rb
 test/jmx_client_test.rb
-test/jmx_notification_test.rb
 test/jmx_server_test.rb
-test/object_name_test.rb
