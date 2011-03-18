@@ -10,8 +10,8 @@ $LOAD_PATH << 'lib'
 require 'jmx/version'
 begin
   require 'hoe'
-  Hoe.new("jmxjr", JMX::VERSION) do |p|
-    p.rubyforge_name = "kenai"
+  Hoe.new("jmx", JMX::VERSION) do |p|
+    p.rubyforge_name = "jruby-extras"
     p.url = "http://github.com/enebo/jmxjr"
     p.author = "Thomas Enebo & Jay McGaffigan"
     p.email = "tom.enebo@gmail.com"
