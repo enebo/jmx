@@ -207,7 +207,8 @@ class RubyDynamicMBean
   
   # Thread local storage for the derived bean
   def self.local_hash
-    Thread.current[self.name] ||= {}
+    @@metadata ||= {}
+    @@metadata[object_id] ||= {}
   end
 
   # when creating a dynamic MBean we need to provide it with a name and a description.
