@@ -123,53 +123,54 @@ class RubyDynamicMBean
     local_hash[:ops] ||= []
   end
 
-  def self.define_getter(name, type)
+  def self.define_getter(name, type, reader)
     # FIXME: Our to_java_type needs to do something saner
     java_type = begin; to_java_type(type); rescue; nil; end
     value_proc = java_type ? proc { |value| java_type.new value } : proc { |value| Java.ruby_to_java value }
 
+    reader = name.to_s unless reader
+    attr_reader reader unless instance_methods.include?(reader)
     define_method("jmx_get_#{name.downcase}") do
-      javax.management.Attribute.new name, value_proc.call(instance_variable_get('@' + name))
+      javax.management.Attribute.new name, value_proc.call(__send__(reader))
     end
   end
 
-  def self.define_setter(name, type)
+  def self.define_setter(name, type, writer)
     value_converter = JMX::JavaTypeAware.to_ruby(type)
 
-    define_method("jmx_set_#{name.downcase}") do |value| 
-      instance_variable_set '@' + name, value_converter.call(value)
-    end    
+    writer = name.to_s + '=' unless writer
+    attr_writer name.to_s unless instance_methods.include?(writer)
+    define_method("jmx_set_#{name.downcase}") do |value|
+      __send__ writer, value_converter.call(value)
+    end
   end
   
   # the <tt>rw_attribute</tt> method is used to declare a JMX read write attribute. See the +JavaSimpleTypes+
   # module for more information about acceptable types usage: 
   #     rw_attribute :attribute_name, :string, "Description displayed in a JMX console"
-  def self.rw_attribute(name, type, description)
+  def self.rw_attribute(name, type, description, reader=nil, writer=nil)
     name = name.to_s
     attributes << JMX::Attribute.new(name, type, description, true, true).to_jmx
-    attr_accessor name
-    define_getter name, type
-    define_setter name, type
+    define_getter name, type, reader
+    define_setter name, type, writer
   end
 
   # the <tt>r_attribute</tt> method is used to declare a JMX read only attribute. See the +JavaSimpleTypes+ 
   # module for more information about acceptable types usage: 
   #     r_attribute :attribute_name, :string, "Description displayed in a JMX console"
-  def self.r_attribute(name, type, description)
+  def self.r_attribute(name, type, description, reader=nil)
     name = name.to_s
     attributes << JMX::Attribute.new(name, type, description, true, false).to_jmx
-    attr_reader name
-    define_getter name, type
+    define_getter name, type, reader
   end
   
   # the <tt>w_attribute</tt> method is used to declare a JMX write only attribute. See the +JavaSimpleTypes+ 
   # module for more information about acceptable types usage: 
   #     w_attribute :attribute_name, :string, "Description displayed in a JMX console"
-  def self.w_attribute(name, type, description)
+  def self.w_attribute(name, type, description, writer=nil)
     name = name.to_s
     attributes << JMX::Attribute.new(name, type, description, false, true).to_jmx
-    attr_writer name
-    define_setter name, type
+    define_setter name, type, writer
   end
 
   # Use the operation method to declare the start of an operation

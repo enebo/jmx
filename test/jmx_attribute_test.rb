@@ -20,6 +20,10 @@ class MyAttributeDynamicBean < RubyDynamicMBean
   def fetch_number_write_only
     @number_write_only
   end
+
+  def my_reader
+    42
+  end
 end
 
 
@@ -74,6 +78,5 @@ class JMXAttributeTest < Test::Unit::TestCase
     assert_equal("red", @madb.name)
     assert_equal(3, @madb.fetch_number_write_only)
   end
-  
 end
 

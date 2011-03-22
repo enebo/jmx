@@ -1,5 +1,3 @@
-# In order to run these tests you must be running GFv2
-
 $:.unshift File.join(File.dirname(__FILE__),'..','lib')
 
 require 'test/unit'
