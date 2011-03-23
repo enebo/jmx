@@ -1,29 +1,29 @@
-= JMX
+# JMX
 
-== DESCRIPTION:
+## DESCRIPTION:
 
 JMX is a library which allows you to access JMX MBeans as a client or create
 your own MBeans as a Ruby class.
 
-http://jruby-extras.rubyforge.org/jmx/
-
-== FEATURES/PROBLEMS:
+## FEATURES/PROBLEMS:
 
 * Use '-J-Dcom.sun.management.jmxremote' to make jruby process accessible from a jruby command-line
 
-== SYNOPSIS:
+## SYNOPSIS:
 
-require 'jmx'
+Connect to same JVM as client script and look at Memory MBean
 
-client = JMX.simple_connect(:port => 9999)
+   require 'jmx'
 
-memory = client["java.lang:type=Memory"]
-puts memory.attributes
+   client = JMX.simple_connect(:port => 9999)
 
-== REQUIREMENTS:
+   memory = client["java.lang:type=Memory"]
+   puts memory.attributes
+
+## REQUIREMENTS:
 
 * JRuby
 
-== INSTALL:
+## INSTALL:
 
 * jruby -S gem install jmx
