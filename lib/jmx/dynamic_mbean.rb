@@ -109,18 +109,36 @@ class RubyDynamicMBean
   # TODO: preserve any original method_added?
   # TODO: Error handling here when it all goes wrong?
   def self.method_added(name) #:nodoc:
-    return if local_hash[:op].nil?
-    local_hash[:op].name = name
-    operations << local_hash[:op].to_jmx
-    local_hash[:op] = nil
+    return if metadata[:op].nil?
+    metadata[:op].name = name
+    operations << metadata[:op].to_jmx
+    metadata[:op] = nil
   end
 
-  def self.attributes #:nodoc:
-    local_hash[:attrs] ||= []
+  # All attributes in this class
+  def self.attributes
+    metadata[:attrs] ||= []
+  end
+
+  # All attributes up the inheritance chain
+  def self.all_attributes
+    ancestors.inject([]) do |sum, clazz|
+      sum.concat(clazz.attributes) if clazz.respond_to? :attributes
+      sum
+    end
+  end
+
+  # All operations up the inheritance chain
+  def self.all_operations
+    ancestors.inject([]) do |sum, clazz|
+      sum.concat(clazz.operations) if clazz.respond_to? :operations
+      sum
+    end
   end
   
-  def self.operations #:nodoc:
-    local_hash[:ops] ||= []
+  # All operations in this class
+  def self.operations
+    metadata[:ops] ||= []
   end
 
   def self.define_getter(name, type, reader)
@@ -183,7 +201,7 @@ class RubyDynamicMBean
   #++
   def self.operation(description)
     # Wait to error check until method_added so we can know method name
-    local_hash[:op] = JMX::Operation.new description
+    metadata[:op] = JMX::Operation.new description
   end
 
   # Used to declare a parameter (you can declare more than one in succession) that
@@ -193,7 +211,7 @@ class RubyDynamicMBean
   #     def start
   #     end
   def self.parameter(type, name=nil, description=nil)
-    local_hash[:op].parameters << JMX::Parameter.new(type, name, description)
+    metadata[:op].parameters << JMX::Parameter.new(type, name, description)
   end
 
   # Used to declare the return type of the operation
@@ -203,19 +221,19 @@ class RubyDynamicMBean
   #     def set_name
   #     end
   def self.returns(type)
-    local_hash[:op].return_type = type
+    metadata[:op].return_type = type
   end
   
   # Thread local storage for the derived bean
-  def self.local_hash
+  def self.metadata
     @@metadata ||= {}
     @@metadata[object_id] ||= {}
   end
 
   # when creating a dynamic MBean we need to provide it with a name and a description.
   def initialize(name, description)
-    operations = self.class.operations.to_java MBeanOperationInfo
-    attributes = self.class.attributes.to_java MBeanAttributeInfo
+    operations = self.class.all_operations.to_java MBeanOperationInfo
+    attributes = self.class.all_attributes.to_java MBeanAttributeInfo
     @info = MBeanInfo.new name, description, attributes, nil, operations, nil
   end
 

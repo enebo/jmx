@@ -55,6 +55,15 @@ class MyDynamicMBean < RubyDynamicMBean
   end
 end
 
+class MyExtendedDynamicMBean < MyDynamicMBean
+  operation "Triples a value"
+  parameter :int, "a", "Value to triple"
+  returns :int
+  def triple(a)
+    a + a + a
+  end
+end
+
 class JMXServerTest < Test::Unit::TestCase
   PORT = 9999
   URL = "service:jmx:rmi:///jndi/rmi://localhost:#{PORT}/jmxrmi"
@@ -106,5 +115,15 @@ class JMXServerTest < Test::Unit::TestCase
 
     @bean.explicit_both = 1
     assert_equal(1, @bean.explicit_both)
+  end
+
+  def test_extended_mbean
+    dyna = MyExtendedDynamicMBean.new("domain.MySuperBean", "Heh")
+    @server.register_mbean dyna, "#{@domain}:type=MyExtendedDynamicMBean"
+    @bean = @client["#{@domain}:type=MyExtendedDynamicMBean"]
+
+    assert_equal(12, @bean.triple(4))
+
+    @server.unregister_mbean "#{@domain}:type=MyExtendedDynamicMBean"
   end
 end
