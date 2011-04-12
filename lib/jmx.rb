@@ -151,12 +151,6 @@ module JMX
       @server.removeNotificationListener @object_name, listener
     end
 
-    def method_missing(name, *args)
-      puts "Invoking: #{name}, #{args}"
-      java_args = java_args(args)
-      @server.invoke @object_name, name.to_s, java_args, java_types(java_args)
-    end
-
     private
 
     # Define ruby friendly methods for attributes.  For odd attribute names or names
