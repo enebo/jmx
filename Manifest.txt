@@ -1,6 +1,6 @@
 Manifest.txt
 Rakefile
-README.txt
+README.md
 LICENSE.txt
 lib/jmx
 lib/jmx.rb
