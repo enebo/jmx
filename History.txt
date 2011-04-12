@@ -18,3 +18,7 @@ See https://github.com/enebo/jmxjr/issues for details
 - 2: MBean attributes shouldn't be tied to MBean instance variables. 
 - 3: MBeans created by another MBean don't have attributes/operations show up
 - 4: Extended MBeans don't have parents operations/attributes.
+
+== 0.7
+
+- 5: JMX::MBeanProxy#method_missing is broken (removed method_missing. dead)
