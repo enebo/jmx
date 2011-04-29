@@ -153,19 +153,24 @@ module JMX
 
     private
 
+    def safe_define_method(method_name, &block)
+      method_name = "mbean_#{method_name}" if respond_to?(method_name) || method_name == 'initialize'
+      self.class.__send__(:define_method, method_name, &block)
+    end
+    
     # Define ruby friendly methods for attributes.  For odd attribute names or names
     # that you want to call with the actual attribute name you can call aref/aset
     def define_attributes
       @info.attributes.each do |attr|
         rname = underscore(attr.name)
-        self.class.__send__(:define_method, rname) { self[attr.name] } if attr.readable?
-        self.class.__send__(:define_method, rname + "=") {|v| self[attr.name] = v } if attr.writable?
+        safe_define_method(rname) { self[attr.name] } if attr.readable?
+        safe_define_method(rname + "=") { |v| self[attr.name] = v } if attr.writable?
       end
     end
 
     def define_operations
-      @info.operations.each do |op| 
-        self.class.__send__(:define_method, op.name) do |*args|
+      @info.operations.each do |op|
+        safe_define_method(op.name) do |*args|
           jargs, jtypes = java_args(op.signature, args)
           @server.invoke @object_name, op.name, jargs, jtypes
         end
