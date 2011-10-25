@@ -154,8 +154,12 @@ module JMX
     private
 
     def safe_define_method(method_name, &block)
-      method_name = "mbean_#{method_name}" if respond_to?(method_name) || method_name == 'initialize'
-      self.class.__send__(:define_method, method_name, &block)
+      @@defined_methods ||= Hash.new { |h, k| h[k] = [] }
+      unless @@defined_methods[self.class.name].include?(method_name)
+        @@defined_methods[self.class.name] << method_name
+        method_name = "mbean_#{method_name}" if respond_to?(method_name) || method_name == 'initialize'
+        self.class.__send__(:define_method, method_name, &block)
+      end
     end
     
     # Define ruby friendly methods for attributes.  For odd attribute names or names
