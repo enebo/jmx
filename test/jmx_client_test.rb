@@ -5,12 +5,12 @@ require 'rmi'
 require 'jmx'
 
 PORT = 9999
-$registry = RMIRegistry.new PORT
 
 class JMXConnectorClientTest < Test::Unit::TestCase
   URL = "service:jmx:rmi:///jndi/rmi://localhost:#{PORT}/jmxrmi"
   
   def setup
+    @registry = RMIRegistry.new PORT
     @connector = JMX::MBeanServerConnector.new(URL, JMX::MBeanServer.new)
     @connector.start
     @client = JMX::connect(:port => PORT)
@@ -18,6 +18,7 @@ class JMXConnectorClientTest < Test::Unit::TestCase
   
   def teardown
     @connector.stop
+    @registry.stop
   end
 
   def test_invalid_mbean_name
