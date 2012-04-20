@@ -10,8 +10,7 @@ memory = client["java.lang:type=Memory"]
 
 Thread.new do
   puts "Enter 'gc' to garbage collect or anything else to quit"
-  while (command = gets.chomp)
-    break if command != "gc"
+  while gets.chomp == "gc"
     memory.gc
   end
 
