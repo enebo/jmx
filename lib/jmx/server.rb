@@ -92,7 +92,7 @@ module JMX
       return object_name if object_name.kind_of? ObjectName
 
       ObjectName.new object_name
-    rescue
+    rescue Exception
       raise ArgumentError.new("Invalid ObjectName #{$!.message}")
     end
   end
