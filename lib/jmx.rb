@@ -84,6 +84,8 @@ module JMX
     # name back to the caller.
     def self.parent_for(java_class_fqn)
       java_class_fqn.split(".").inject(MBeans) do |parent, segment|
+        # const_defined? will crash later if we don't remove $
+        segment.gsub!('$', 'Dollar') if segment =~ /\$/
         # Note: We are boned if java class name is lower cased
         return [parent, segment] if segment =~ /^[A-Z]/
 

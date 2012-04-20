@@ -6,9 +6,11 @@ lib/jmx
 lib/jmx.rb
 lib/rmi.rb
 lib/jmx/dynamic_mbean.rb
+lib/jmx/notifier.rb
 lib/jmx/server.rb
 lib/jmx/version.rb
 samples/memory.rb
 test/jmx_attribute_test.rb
 test/jmx_client_test.rb
+test/jmx_mangling_test.rb
 test/jmx_server_test.rb
