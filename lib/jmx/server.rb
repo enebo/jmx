@@ -1,3 +1,5 @@
+require 'jmx/object_name'
+
 module JMX
   # The MBeanServer represents a connection to an MBean server
   # rather than an actual MBean server.  Depending upon how 
@@ -33,7 +35,7 @@ module JMX
     end
 
     def [](object_name)
-      name = make_object_name object_name
+      name = ObjectName.make object_name
 
       unless @server.isRegistered(name)
         raise NoSuchBeanError.new("No name: #{object_name}") 
@@ -45,7 +47,7 @@ module JMX
     end
 
     def []=(class_name, object_name)
-      name = make_object_name object_name
+      name = ObjectName.make object_name
 
       @server.createMBean class_name, name, nil, nil
 
@@ -65,35 +67,23 @@ module JMX
     end
 
     def query_names(name=nil, query=nil)
-      object_name = name.nil? ? nil : make_object_name(name)
+      object_name = name.nil? ? nil : ObjectName.make(name)
 
       @server.query_names(object_name, query)
     end
     
     def unregister_mbean(object_name)
-      name = make_object_name object_name
-      @server.unregisterMBean(name)
-      
+      @server.unregisterMBean(ObjectName.make(object_name))
     end
 
     def register_mbean(object, object_name)
-      name = make_object_name object_name
+      name = ObjectName.make(object_name)
       @server.registerMBean(object, name)
       MBeanProxy.generate(@server, name)
     end
     
     def self.find(agent_id=nil)
       MBeanServerFactory.findMBeanServer(agent_id)
-    end
-
-    private
-
-    def make_object_name(object_name)
-      return object_name if object_name.kind_of? ObjectName
-
-      ObjectName.new object_name
-    rescue Exception
-      raise ArgumentError.new("Invalid ObjectName #{$!.message}")
     end
   end
 

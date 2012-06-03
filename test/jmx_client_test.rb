@@ -71,6 +71,16 @@ class JMXConnectorClientTest < Test::Unit::TestCase
 
     assert(heap1.to_i >= heap2.to_i, "GC did not collect")
   end
+
+  def test_simple_operation
+    memory = @client["java.lang:type=Memory"]
+
+    heap1 = memory[:HeapMemoryUsage][:used]
+    memory.invoke(:gc)
+    heap2 = memory[:HeapMemoryUsage][:used]
+
+    assert(heap1.to_i >= heap2.to_i, "GC did not collect")
+  end
   
   def test_query_names
     names = @client.query_names("java.lang:type=MemoryPool,*")
