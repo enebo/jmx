@@ -129,6 +129,9 @@ module JMX
         required_type = JavaClass.for_name(type)
         
         java_arg = param.to_java(:object)
+        java_arg = param.to_java(Java::java.lang.Integer) if required_type.name == "int"
+        java_arg = param.to_java(Java::java.lang.Short) if required_type.name == "short"
+        java_arg = param.to_java(Java::java.lang.Float) if required_type.name == "float"
 
         if (param.kind_of? Array)
           java_arg = param.inject(ArrayList.new) {|l, element| l << element }
