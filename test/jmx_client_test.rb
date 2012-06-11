@@ -81,6 +81,13 @@ class JMXConnectorClientTest < Test::Unit::TestCase
 
     assert(heap1.to_i >= heap2.to_i, "GC did not collect")
   end
+
+  def test_primitive_return_operation
+    threading = @client["java.lang:type=Threading"]
+    a_thread_id = threading[:AllThreadIds][0]
+
+    assert_not_nil threading.getThreadCpuTime(a_thread_id)
+  end
   
   def test_query_names
     names = @client.query_names("java.lang:type=MemoryPool,*")
