@@ -116,6 +116,13 @@ module JMX
       end
     end
 
+    PRIMITIVE_JAVA_TYPES = {
+      'int' => Java::java.lang.Integer,
+      'short' => Java::java.lang.Short,
+      'float' => Java::java.lang.Float,
+      'boolean' => Java::java.lang.Boolean
+    }
+
     # Given the signature and the parameters supplied do these signatures match.
     # Repackage these parameters as Java objects in a primitive object array.
     def java_args(signature, params)
@@ -127,8 +134,8 @@ module JMX
         type = signature[i].get_type
         jtypes << type
         required_type = JavaClass.for_name(type)
-        
-        java_arg = param.to_java(:object)
+        java_type = PRIMITIVE_JAVA_TYPES[required_type.name] || :object
+        java_arg = param.to_java(java_type)
 
         if (param.kind_of? Array)
           java_arg = param.inject(ArrayList.new) {|l, element| l << element }
