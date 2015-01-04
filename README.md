@@ -12,7 +12,7 @@ Connect to same JVM as client script and look at Memory MBean
 ```ruby
    require 'jmx'
 
-   client = JMX.simple_connect(:port => 9999)
+   client = JMX.connect(:host => 'localhost', :port => 9999)
 
    memory = client["java.lang:type=Memory"]
    puts memory.attributes
