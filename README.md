@@ -35,12 +35,12 @@ You can also create your own MBeans and register them as well:
      end
    end
 
-   server = JMX::MBeanServer.new
+   my)server = JMX::MBeanServer.new
    my_server_connector = JMX.simple_server(server: server)
 
    dyna = MyDynamicMBean.new("domain.MySuperBean", "Heh")
-   domain = server.default_domain
-   server.register_mbean dyna, "#{domain}:type=MyDynamicMBean"
+   domain = my_server.default_domain
+   my_server.register_mbean dyna, "#{domain}:type=MyDynamicMBean"
 ```
 
 ## REQUIREMENTS:
