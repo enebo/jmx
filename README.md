@@ -35,7 +35,7 @@ You can also create your own MBeans and register them as well:
      end
    end
 
-   my)server = JMX::MBeanServer.new
+   my_server = JMX::MBeanServer.new
    my_server_connector = JMX.simple_server(server: server)
 
    dyna = MyDynamicMBean.new("domain.MySuperBean", "Heh")
