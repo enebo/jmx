@@ -36,8 +36,9 @@ module JMX
   def self.simple_server(opts = {})
     port = opts[:port] || 8686
     url_path = opts[:url_path] || "/jmxrmi"
+    server = opts[:server] || JMX::MBeanServer.new
     url = "service:jmx:rmi:///jndi/rmi://localhost:#{port}#{url_path}"
-    $registry = RMIRegistry.new port
+    $registry = opts[:registry] || RMIRegistry.new(port)
     @connector = JMX::MBeanServerConnector.new(url, JMX::MBeanServer.new).start
   end
 end
