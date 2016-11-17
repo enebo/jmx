@@ -16,10 +16,10 @@ module JMX
         return [parent, segment] if segment =~ /^[A-Z]/
 
         segment.capitalize!
-        unless parent.const_defined? segment
+        unless parent.const_defined? segment, false
           parent.const_set segment, Module.new
         else 
-          parent.const_get segment
+          parent.const_get segment, false
         end
       end
 
