@@ -29,8 +29,8 @@ module JMX
     def self.generate(server, object_name)
       parent, class_name = MBeans.parent_for object_name.info(server).class_name
 
-      if parent.const_defined? class_name
-        proxy = parent.const_get(class_name)
+      if parent.const_defined? class_name, false
+        proxy = parent.const_get(class_name, false)
       else
         proxy = Class.new MBeanProxy
         parent.const_set class_name, proxy
