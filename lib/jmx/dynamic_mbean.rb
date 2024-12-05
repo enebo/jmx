@@ -13,6 +13,7 @@ module JMX
       :list => ['java.util.List', lambda {|param| param.to_a}],
       :long => ['java.lang.Long', lambda {|param| param.to_i}],
       :float => ['java.lang.Float', lambda {|param| param.to_f}],
+      :double => ['java.lang.Double', lambda {|param| param.to_f}],
       :map => ['java.util.Map', lambda {|param| param}],
       :set => ['java.util.Set', lambda {|param| param}],
       :string => ['java.lang.String', lambda {|param| param.to_s}],
